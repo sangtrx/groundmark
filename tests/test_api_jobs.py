@@ -42,3 +42,24 @@ def test_sync_and_durable_async_api(tmp_path, monkeypatch) -> None:
     result = client.get(f"/v1/jobs/{job_id}/result")
     assert result.status_code == 200
     assert "Durable" in result.json()["markdown"]
+
+
+def test_api_auth_uses_standard_bearer_header(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("GROUNDMARK_DATA_DIR", str(tmp_path / "auth-data"))
+    monkeypatch.setenv("GROUNDMARK_API_KEY", "test-secret")
+
+    import groundmark.settings as settings_module
+
+    settings_module.get_settings.cache_clear()
+    import groundmark.api as api_module
+
+    api_module = importlib.reload(api_module)
+    client = TestClient(api_module.app)
+
+    assert client.get("/v1/capabilities").status_code == 401
+    assert (
+        client.get(
+            "/v1/capabilities", headers={"Authorization": "Bearer test-secret"}
+        ).status_code
+        == 200
+    )

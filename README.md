@@ -171,7 +171,7 @@ Open `http://localhost:8000/docs` for the generated OpenAPI documentation.
 
 ```bash
 curl -X POST http://localhost:8000/v1/parse \
-  -H "X-API-Key: change-me" \
+  -H "Authorization: Bearer change-me" \
   -F document=@report.pdf \
   -F mode=accurate \
   -F run_repair=true \
@@ -182,7 +182,7 @@ curl -X POST http://localhost:8000/v1/parse \
 
 ```bash
 curl -X POST http://localhost:8000/v1/extract \
-  -H "X-API-Key: change-me" \
+  -H "Authorization: Bearer change-me" \
   -F document=@invoice.pdf \
   -F 'schema={"type":"object","properties":{"invoice_number":{"type":"string"},"total":{"type":"number"}},"required":["invoice_number","total"],"additionalProperties":false}' \
   -F provider=openai

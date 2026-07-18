@@ -114,7 +114,7 @@
     <div><label>Mode</label><select id="mode" name="mode"><option>fast</option><option selected>balanced</option><option>accurate</option></select></div>
     <div><label>Parser</label><select id="parser" name="parser"><option selected>auto</option><option>markitdown</option><option>native</option><option>docling</option></select></div>
     <div><label>OpenAI repair</label><select id="repair"><option value="false" selected>Off</option><option value="true">Weak regions</option></select></div>
-    <div><label>API key (optional)</label><div style="display:flex;gap:8px"><input id="apiKey" type="password" placeholder="X-API-Key" /><button id="run" style="width:96px">Parse</button></div></div>
+    <div><label>Bearer token (optional)</label><div style="display:flex;gap:8px"><input id="apiKey" type="password" placeholder="Authorization token" /><button id="run" style="width:96px">Parse</button></div></div>
   </form>
   <div id="error" class="error"></div>
   <section class="grid">
@@ -204,7 +204,7 @@
     body.append('run_repair', document.querySelector('#repair').value);
     const headers = {};
     const apiKey = document.querySelector('#apiKey').value.trim();
-    if (apiKey) headers['X-API-Key'] = apiKey;
+    if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
     try {
       const response = await fetch('/v1/parse', {method: 'POST', headers, body});
       const payload = await response.json();

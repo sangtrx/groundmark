@@ -41,18 +41,17 @@ if settings.cors_origins:
         ],
         allow_credentials=False,
         allow_methods=["GET", "POST", "DELETE"],
-        allow_headers=["Authorization", "Content-Type", "X-API-Key", "Idempotency-Key"],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key"],
     )
 
 
 def require_api_key(
     authorization: Annotated[str | None, Header()] = None,
-    x_api_key: Annotated[str | None, Header()] = None,
 ) -> None:
     if not settings.api_key:
         return
     bearer = authorization.removeprefix("Bearer ").strip() if authorization else None
-    if x_api_key != settings.api_key and bearer != settings.api_key:
+    if bearer != settings.api_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid API key")
 
 
