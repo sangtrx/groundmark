@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GroundMark Console</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b10;
+      --panel: rgba(20, 24, 33, .78);
+      --line: #2a3140;
+      --text: #f4f7fb;
+      --muted: #9ea8b8;
+      --accent: #8ef0c2;
+      --accent-2: #8db7ff;
+      --danger: #ff8f9c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(83, 113, 255, .16), transparent 34rem),
+        radial-gradient(circle at 95% 15%, rgba(83, 255, 181, .12), transparent 30rem),
+        var(--bg);
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(9, 11, 16, .78);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .mark {
+      width: 38px; height: 38px; border-radius: 12px;
+      display: grid; place-items: center; color: #07130e; font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 30px rgba(100, 223, 190, .2);
+    }
+    h1 { font-size: 17px; margin: 0; letter-spacing: .2px; }
+    .subtitle { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    a { color: var(--accent-2); text-decoration: none; }
+    main { padding: 24px; max-width: 1600px; margin: auto; }
+    .toolbar, .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+    }
+    .toolbar { padding: 16px; display: grid; grid-template-columns: minmax(240px, 1fr) 130px 150px 150px 220px; gap: 12px; }
+    label { font-size: 11px; color: var(--muted); display: block; margin: 0 0 7px 2px; text-transform: uppercase; letter-spacing: .08em; }
+    input, select, button {
+      width: 100%; height: 42px; border-radius: 11px; border: 1px solid var(--line);
+      background: #10141d; color: var(--text); padding: 0 12px; font: inherit;
+    }
+    input[type=file] { padding: 8px; }
+    button {
+      cursor: pointer; border: 0; font-weight: 760; color: #07130e;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+    button:disabled { opacity: .45; cursor: wait; }
+    .grid { display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 18px; margin-top: 18px; }
+    .panel { min-height: 690px; overflow: hidden; }
+    .panel-head { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--line); }
+    .panel-title { font-size: 13px; font-weight: 750; }
+    .status { font-size: 12px; color: var(--muted); }
+    .status.ok { color: var(--accent); }
+    .status.bad { color: var(--danger); }
+    #preview { width: 100%; height: 635px; border: 0; background: #11151e; }
+    .empty { height: 635px; display: grid; place-items: center; text-align: center; color: var(--muted); padding: 40px; }
+    .tabs { display: flex; gap: 4px; }
+    .tab { width: auto; height: 32px; padding: 0 11px; color: var(--muted); background: transparent; border: 1px solid transparent; font-size: 12px; }
+    .tab.active { color: var(--text); border-color: var(--line); background: #111620; }
+    .view { height: 635px; overflow: auto; padding: 18px; display: none; }
+    .view.active { display: block; }
+    pre { white-space: pre-wrap; word-break: break-word; margin: 0; font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; color: #dfe7f3; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-bottom: 16px; }
+    .metric { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #10141d; }
+    .metric b { display: block; font-size: 18px; }
+    .metric span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 9px 7px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .07em; position: sticky; top: -18px; background: #11151d; }
+    .pill { display: inline-flex; padding: 3px 7px; border: 1px solid var(--line); border-radius: 999px; color: var(--accent-2); }
+    .error { margin: 16px 0 0; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,143,156,.35); color: var(--danger); background: rgba(255,143,156,.07); display: none; }
+    @media (max-width: 1000px) {
+      .toolbar, .grid { grid-template-columns: 1fr; }
+      .panel { min-height: 520px; }
+      #preview, .empty, .view { height: 465px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="mark">G</div>
+    <div><h1>GroundMark Console</h1><div class="subtitle">MarkItDown + grounded layout + OpenAI Responses API</div></div>
+  </div>
+  <div class="subtitle"><a href="/docs">API docs</a> · <a href="/v1/capabilities">Capabilities</a></div>
+</header>
+<main>
+  <form id="form" class="toolbar">
+    <div><label>Document</label><input id="file" name="document" type="file" required /></div>
+    <div><label>Mode</label><select id="mode" name="mode"><option>fast</option><option selected>balanced</option><option>accurate</option></select></div>
+    <div><label>Parser</label><select id="parser" name="parser"><option selected>auto</option><option>markitdown</option><option>native</option><option>docling</option></select></div>
+    <div><label>OpenAI repair</label><select id="repair"><option value="false" selected>Off</option><option value="true">Weak regions</option></select></div>
+    <div><label>API key (optional)</label><div style="display:flex;gap:8px"><input id="apiKey" type="password" placeholder="X-API-Key" /><button id="run" style="width:96px">Parse</button></div></div>
+  </form>
+  <div id="error" class="error"></div>
+  <section class="grid">
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Source document</div><div id="fileMeta" class="status">No file</div></div>
+      <div id="previewEmpty" class="empty">Choose a PDF or supported document. PDFs render here; other formats are still parsed.</div>
+      <iframe id="preview" hidden></iframe>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="panel-title">Parsed result</div><div id="status" class="status">Ready</div></div>
+        <div class="tabs"><button type="button" class="tab active" data-tab="summary">Summary</button><button type="button" class="tab" data-tab="markdown">Markdown</button><button type="button" class="tab" data-tab="json">JSON</button></div>
+      </div>
+      <div id="summary" class="view active"><div class="empty" style="height:auto;min-height:560px">Run a parse to inspect confidence, providers, chunks, and grounded blocks.</div></div>
+      <div id="markdown" class="view"><pre></pre></div>
+      <div id="json" class="view"><pre></pre></div>
+    </div>
+  </section>
+</main>
+<script>
+  const form = document.querySelector('#form');
+  const fileInput = document.querySelector('#file');
+  const preview = document.querySelector('#preview');
+  const previewEmpty = document.querySelector('#previewEmpty');
+  const errorBox = document.querySelector('#error');
+  const statusEl = document.querySelector('#status');
+  let objectUrl;
+
+  document.querySelectorAll('.tab').forEach(button => button.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(item => item.classList.remove('active'));
+    button.classList.add('active');
+    document.querySelector('#' + button.dataset.tab).classList.add('active');
+  }));
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    document.querySelector('#fileMeta').textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    if (file.type === 'application/pdf') {
+      objectUrl = URL.createObjectURL(file);
+      preview.src = objectUrl;
+      preview.hidden = false;
+      previewEmpty.hidden = true;
+    } else {
+      preview.hidden = true;
+      previewEmpty.hidden = false;
+      previewEmpty.textContent = `Preview is not available for ${file.type || file.name.split('.').pop()}, but GroundMark can parse it.`;
+    }
+  });
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+
+  function renderSummary(data) {
+    const blocks = data.pages.flatMap(page => page.blocks.map(block => ({...block, pageNumber: page.number})));
+    const rows = blocks.map(block => `<tr>
+      <td>${block.pageNumber}</td><td><span class="pill">${escapeHtml(block.type)}</span></td>
+      <td>${Number(block.confidence).toFixed(3)}</td><td>${escapeHtml(block.metadata.grounding_quality || '')}</td>
+      <td>${escapeHtml((block.text || '').slice(0, 130))}</td>
+    </tr>`).join('');
+    document.querySelector('#summary').innerHTML = `
+      <div class="metrics">
+        <div class="metric"><b>${Number(data.confidence).toFixed(3)}</b><span>Confidence</span></div>
+        <div class="metric"><b>${data.pages.length}</b><span>Pages</span></div>
+        <div class="metric"><b>${blocks.length}</b><span>Blocks</span></div>
+        <div class="metric"><b>${data.chunks.length}</b><span>RAG chunks</span></div>
+      </div>
+      <div style="margin-bottom:14px;color:var(--muted);font-size:12px">${escapeHtml(data.metadata.parser)} · ${data.metadata.elapsed_ms} ms · ${data.metadata.cache_hit ? 'cache hit' : 'fresh parse'}</div>
+      <table><thead><tr><th>Page</th><th>Type</th><th>Confidence</th><th>Grounding</th><th>Content</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const file = fileInput.files[0];
+    if (!file) return;
+    const button = document.querySelector('#run');
+    button.disabled = true;
+    statusEl.textContent = 'Parsing…'; statusEl.className = 'status';
+    errorBox.style.display = 'none';
+    const body = new FormData();
+    body.append('document', file);
+    body.append('mode', document.querySelector('#mode').value);
+    body.append('parser', document.querySelector('#parser').value);
+    body.append('run_repair', document.querySelector('#repair').value);
+    const headers = {};
+    const apiKey = document.querySelector('#apiKey').value.trim();
+    if (apiKey) headers['X-API-Key'] = apiKey;
+    try {
+      const response = await fetch('/v1/parse', {method: 'POST', headers, body});
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.detail || JSON.stringify(payload));
+      renderSummary(payload);
+      document.querySelector('#markdown pre').textContent = payload.markdown;
+      document.querySelector('#json pre').textContent = JSON.stringify(payload, null, 2);
+      statusEl.textContent = `Done · ${Number(payload.confidence).toFixed(3)} confidence`;
+      statusEl.className = 'status ok';
+    } catch (error) {
+      statusEl.textContent = 'Failed'; statusEl.className = 'status bad';
+      errorBox.textContent = error.message; errorBox.style.display = 'block';
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

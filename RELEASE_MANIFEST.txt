@@ -1,0 +1,10 @@
+GroundMark 0.4.0
+Build date: 2026-07-18
+
+Primary artifacts:
+- README.md
+- BUILD_REPORT.md
+- docs/architecture.md
+- docs/operations.md
+- docs/security.md
+- dist/groundmark-0.4.0-py3-none-any.whl

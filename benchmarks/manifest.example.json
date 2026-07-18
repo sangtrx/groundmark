@@ -1,0 +1,9 @@
+{
+  "cases": [
+    {
+      "name": "example-text-invoice",
+      "input": "../examples/invoice.txt",
+      "reference_markdown": "reference.invoice.md"
+    }
+  ]
+}

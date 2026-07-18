@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "invoice_number": {"type": "string", "x-aliases": ["invoice no", "invoice #"]},
+    "invoice_date": {"type": "string"},
+    "vendor": {"type": "string", "x-aliases": ["supplier"]},
+    "total_amount": {"type": "number", "x-aliases": ["total", "amount due"]},
+    "paid": {"type": "boolean"}
+  },
+  "required": ["invoice_number", "vendor", "total_amount"]
+}
