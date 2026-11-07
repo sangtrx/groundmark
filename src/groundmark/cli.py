@@ -131,6 +131,40 @@ def evaluate_command(
     typer.echo(payload)
 
 
+@app.command("audit")
+def audit_command(
+    document_json: Path = typer.Argument(..., exists=True, dir_okay=False),
+    extraction_json: Path = typer.Argument(..., exists=True, dir_okay=False),
+    output: Path | None = typer.Option(None, "--output", "-o"),
+) -> None:
+    """Check saved extraction citations against saved grounded document JSON."""
+    from groundmark.evidence_audit import audit_extraction
+    from groundmark.models import ExtractionResult, ParsedDocument
+
+    try:
+        document = ParsedDocument.model_validate_json(document_json.read_text(encoding="utf-8"))
+        extraction = ExtractionResult.model_validate_json(
+            extraction_json.read_text(encoding="utf-8")
+        )
+    except (OSError, UnicodeError, ValueError):
+        typer.echo("Invalid document or extraction JSON", err=True)
+        raise typer.Exit(code=2) from None
+
+    report = audit_extraction(document, extraction)
+    payload = report.model_dump_json(indent=2)
+    if output:
+        try:
+            output.write_text(payload + "\n", encoding="utf-8")
+        except OSError:
+            typer.echo("Unable to write audit report", err=True)
+            raise typer.Exit(code=2) from None
+    else:
+        typer.echo(payload)
+
+    if not report.ok:
+        raise typer.Exit(code=1)
+
+
 @app.command()
 def capabilities() -> None:
     settings = get_settings()
