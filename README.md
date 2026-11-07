@@ -125,6 +125,21 @@ GROUNDMARK_OPENAI_DEFAULT_FOR_SECTION=false
 
 `OPENAI_API_KEY` is the recommended standard. `GROUNDMARK_OPENAI_API_KEY` and `GROUNDMARK_OPENAI_BASE_URL` are also accepted for namespaced service deployments.
 
+## Offline evidence audit
+
+Verify persisted source references **without an API key**:
+
+```bash
+groundmark parse examples/invoice.txt --json /tmp/invoice.document.json --output /tmp/invoice.md
+groundmark extract examples/invoice.txt --schema examples/invoice.schema.json --provider heuristic --output /tmp/invoice.extraction.json
+groundmark audit /tmp/invoice.document.json /tmp/invoice.extraction.json --output /tmp/invoice.audit.json
+```
+
+The audit validates block IDs, source pages and boxes, quotes and data-path
+consistency. It does **not** prove that an extracted value is semantically
+entailed by its citation. See [Evidence Audit](docs/evidence-audit.md) for
+the report schema, limits, and CI exit codes.
+
 ## CLI
 
 ```bash
